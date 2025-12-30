@@ -14,7 +14,8 @@ import java.util.Optional;
 /**
  * Data Transfer Object implementation of Spring's MultipartFile interface.
  * This class provides an in-memory representation of a multipart file,
- * useful for testing and programmatic file handling without actual file uploads.
+ * useful for testing and programmatic file handling without actual file
+ * uploads.
  *
  * @author avinzhang
  */
@@ -29,7 +30,8 @@ public class MultipartFileDto implements MultipartFile {
      * Creates a new MultipartFileDto with the given byte array content.
      *
      * @param name             the name of the file parameter
-     * @param originalFilename the original filename (as on the client's machine)
+     * @param originalFilename the original filename (as on the client's
+     *                         machine)
      * @param contentType      the MIME type of the file (e.g., "image/jpeg")
      * @param content          the binary content of the file as byte array
      */
@@ -47,8 +49,10 @@ public class MultipartFileDto implements MultipartFile {
      * Creates a new MultipartFileDto with content read from an InputStream.
      *
      * @param name             the name of the file parameter
-     * @param originalFilename the original filename (as on the client's machine)
-     * @param contentType      the MIME type of the file (e.g., "application/pdf")
+     * @param originalFilename the original filename (as on the client's
+     *                         machine)
+     * @param contentType      the MIME type of the file (e.g.,
+     *                         "application/pdf")
      * @param contentStream    the input stream containing the file content
      * @throws IOException if an error occurs while reading from the stream
      */

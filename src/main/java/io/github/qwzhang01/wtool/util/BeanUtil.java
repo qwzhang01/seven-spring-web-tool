@@ -20,22 +20,6 @@ import java.util.stream.IntStream;
  * @author avinzhang
  */
 public class BeanUtil {
-    /**
-     * Safely compares two objects for equality, handling null values.
-     *
-     * @param object1 the first object to compare
-     * @param object2 the second object to compare
-     * @return true if both objects are equal or both are null, false otherwise
-     */
-    public static boolean equals(Object object1, Object object2) {
-        if (object1 == null && object2 == null) {
-            return true;
-        }
-        if (object1 != null) {
-            return object1.equals(object2);
-        }
-        return false;
-    }
 
     /**
      * Copies properties from source object to target object.
@@ -50,14 +34,16 @@ public class BeanUtil {
     }
 
     /**
-     * Creates a new instance of the target type and copies properties from the source object.
+     * Creates a new instance of the target type and copies properties from
+     * the source object.
      *
      * @param source     the source object to copy from
      * @param targetType the class of the target object
      * @param <S>        the type of the source object
      * @param <T>        the type of the target object
      * @return a new instance of the target type with copied properties
-     * @throws BeanCopyException if an error occurs during object creation or property copying
+     * @throws BeanCopyException if an error occurs during object creation or
+     *                           property copying
      */
     public static <S, T> T copyProperties(S source, Class<T> targetType) {
         try {
@@ -71,16 +57,20 @@ public class BeanUtil {
     }
 
     /**
-     * Creates a new instance of the target type, copies properties from the source object,
+     * Creates a new instance of the target type, copies properties from the
+     * source object,
      * and executes a callback for custom transformation logic.
      *
      * @param source     the source object to copy from
      * @param targetType the class of the target object
-     * @param callback   callback function executed after property copying for custom transformations
+     * @param callback   callback function executed after property copying
+     *                   for custom transformations
      * @param <S>        the type of the source object
      * @param <T>        the type of the target object
-     * @return a new instance of the target type with copied and transformed properties
-     * @throws BeanCopyException if an error occurs during object creation or property copying
+     * @return a new instance of the target type with copied and transformed
+     * properties
+     * @throws BeanCopyException if an error occurs during object creation or
+     *                           property copying
      */
     public static <S, T> T copyProperties(S source, Class<T> targetType,
                                           CallCopy<S, T> callback) {
@@ -104,7 +94,8 @@ public class BeanUtil {
      * @param targetType the class of the target objects
      * @param <S>        the type of the source objects
      * @param <T>        the type of the target objects
-     * @return a list of target objects with copied properties, or null if input is null
+     * @return a list of target objects with copied properties, or null if
+     * input is null
      */
     public static <S, T> List<T> copyToList(Collection<S> collection,
                                             Class<T> targetType) {
@@ -125,10 +116,12 @@ public class BeanUtil {
      *
      * @param collection the source collection
      * @param targetType the class of the target objects
-     * @param callback   callback function executed for each object after property copying
+     * @param callback   callback function executed for each object after
+     *                   property copying
      * @param <T>        the type of the target objects
      * @param <S>        the type of the source objects
-     * @return a list of target objects with copied and transformed properties, or null if input is null
+     * @return a list of target objects with copied and transformed
+     * properties, or null if input is null
      */
     public static <T, S> List<T> copyToList(Collection<S> collection,
                                             Class<T> targetType, CallCopy<S,
@@ -148,7 +141,8 @@ public class BeanUtil {
     }
 
     /**
-     * Converts a MyBatis-Plus Page of source objects to a Page of target objects
+     * Converts a MyBatis-Plus Page of source objects to a Page of target
+     * objects
      * by copying properties from each record.
      *
      * @param page       the source page
@@ -167,12 +161,14 @@ public class BeanUtil {
     }
 
     /**
-     * Converts a MyBatis-Plus Page of source objects to a Page of target objects
+     * Converts a MyBatis-Plus Page of source objects to a Page of target
+     * objects
      * by copying properties and applying custom transformation logic.
      *
      * @param page       the source page
      * @param targetType the class of the target objects
-     * @param callback   callback function executed for each record after property copying
+     * @param callback   callback function executed for each record after
+     *                   property copying
      * @param <S>        the type of the source objects
      * @param <T>        the type of the target objects
      * @return a page of target objects with copied and transformed properties
@@ -202,16 +198,79 @@ public class BeanUtil {
             return;
         }
 
-        IntStream.range(0, list.size() - 1).boxed().sorted(Comparator.reverseOrder()).filter(i -> !condition.test(list.get(i), list.get(i + 1))).forEach(i -> list.remove(i.intValue()));
-
+        IntStream.range(0, list.size() - 1).boxed()
+                .sorted(Comparator.reverseOrder())
+                .filter(i -> !condition.test(list.get(i), list.get(i + 1)))
+                .forEach(i -> list.remove(i.intValue()));
     }
 
     /**
-     * Converts an object to a Map representation.
-     * The map keys are the object's property names, and values are the property values.
+     * Safely compares two objects for equality, handling null values.
+     *
+     * @param obj1 the first object to compare
+     * @param obj2 the second object to compare
+     * @return true if both objects are equal or both are null, false otherwise
+     */
+    public static boolean equals(Object obj1, Object obj2) {
+        if (obj1 == null && obj2 == null) {
+            return true;
+        }
+
+        if (obj1 == null) {
+            return false;
+        }
+
+        if (obj2 == null) {
+            return false;
+        }
+
+        return obj1.equals(obj2);
+    }
+
+    /**
+     * Compares two lists for equality by checking if they contain the same
+     * elements (order-independent).
+     * Uses string representation of elements for comparison.
+     *
+     * @param list1 the first list to compare
+     * @param list2 the second list to compare
+     * @return true if both lists contain the same elements (regardless of
+     * order), false otherwise
+     */
+    public static boolean listEquals(List<?> list1, List<?> list2) {
+        if ((list1 == null || list1.isEmpty()) && (list2 == null || list2.isEmpty())) {
+            return true;
+        }
+
+        if (list1 == null || list1.isEmpty()) {
+            return false;
+        }
+
+        if (list2 == null || list2.isEmpty()) {
+            return false;
+        }
+
+        if (list1.size() != list2.size()) {
+            return false;
+        }
+
+        HashSet<String> set =
+                new HashSet<>(list1.stream().map(String::valueOf).toList());
+        int size = set.size();
+        set.addAll(list2.stream().map(String::valueOf).toList());
+        return set.size() == size;
+    }
+
+    /**
+     * Converts an object to a Map representation using reflection.
+     * The map keys are the object's property names, and values are the
+     * property values.
+     * This method integrates with the seven-data-security library for
+     * advanced object introspection.
      *
      * @param obj the object to convert
-     * @return a map representation of the object, or an empty map if obj is null
+     * @return a map representation of the object, or an empty map if obj is
+     * null
      */
     public static Map<String, Object> objectToMap(Object obj) {
         if (obj == null) {

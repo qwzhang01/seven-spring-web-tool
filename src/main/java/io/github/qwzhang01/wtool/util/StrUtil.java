@@ -20,7 +20,8 @@ public class StrUtil {
     }
 
     /**
-     * Checks if a character sequence is blank (null, empty, or contains only whitespace).
+     * Checks if a character sequence is blank (null, empty, or contains only
+     * whitespace).
      *
      * @param cs the character sequence to check
      * @return true if the sequence is blank, false otherwise

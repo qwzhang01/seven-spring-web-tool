@@ -6,7 +6,7 @@
 
     <groupId>io.github.qwzhang01</groupId>
     <artifactId>seven-spring-web-tool</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 
     <url>https://github.com/qwzhang01/seven-spring-web-tool</url>
 
@@ -60,6 +60,7 @@
         <seven-operating-record.version>1.0.1</seven-operating-record.version>
         <seven-data-security.version>1.2.17</seven-data-security.version>
         <junit.jupiter.version>5.10.3</junit.jupiter.version>
+        <mockito.version>5.18.0</mockito.version>
     </properties>
 
     <dependencyManagement>
@@ -140,7 +141,18 @@
             <version>${junit.jupiter.version}</version>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -173,7 +185,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.4.0</version>
                 <configuration>
-                    <skipTests>true</skipTests>
+                    <skipTests>false</skipTests>
                 </configuration>
             </plugin>
             <!-- central发布插件 -->

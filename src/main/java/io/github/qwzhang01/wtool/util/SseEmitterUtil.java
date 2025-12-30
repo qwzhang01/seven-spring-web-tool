@@ -14,7 +14,8 @@ import static io.github.qwzhang01.wtool.util.StrUtil.uuidStr;
 
 /**
  * Utility class for managing Server-Sent Events (SSE) connections.
- * Provides methods for creating, managing, and sending messages through SSE emitters.
+ * Provides methods for creating, managing, and sending messages through SSE
+ * emitters.
  * Supports client connection lifecycle management and message broadcasting.
  *
  * @author avinzhang
@@ -53,7 +54,8 @@ public class SseEmitterUtil {
      *
      * @param clientId the unique identifier for the client
      * @param message  the initial message to send upon connection
-     * @return a new SseEmitter instance configured with timeout and event handlers
+     * @return a new SseEmitter instance configured with timeout and event
+     * handlers
      */
     public static SseEmitter createEmitter(String clientId, String message) {
         String oldClientId = CLIENT.remove(clientId);

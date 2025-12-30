@@ -19,7 +19,8 @@ public class SseMsg {
     private MessageType type;
 
     /**
-     * Constructs a new SSE message with the specified content, sender, and type.
+     * Constructs a new SSE message with the specified content, sender, and
+     * type.
      * The message ID and timestamp are automatically generated.
      *
      * @param content the message content
@@ -78,13 +79,21 @@ public class SseMsg {
      * Enumeration of message types for SSE messages.
      */
     public static enum MessageType {
-        /** Regular text message */
+        /**
+         * Regular text message
+         */
         TEXT,
-        /** Notification message */
+        /**
+         * Notification message
+         */
         NOTIFICATION,
-        /** Alert message requiring attention */
+        /**
+         * Alert message requiring attention
+         */
         ALERT,
-        /** System-generated message */
+        /**
+         * System-generated message
+         */
         SYSTEM
     }
 }
