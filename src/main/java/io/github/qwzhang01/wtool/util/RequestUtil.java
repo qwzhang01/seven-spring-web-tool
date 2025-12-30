@@ -16,7 +16,8 @@ import java.util.Enumeration;
 /**
  * Utility class for HTTP request processing and domain parsing.
  * Provides methods for handling JSON responses, extracting request information,
- * parsing headers, and detecting client IP addresses (including proxy scenarios).
+ * parsing headers, and detecting client IP addresses (including proxy
+ * scenarios).
  *
  * @author avinzhang
  */
@@ -183,7 +184,8 @@ public class RequestUtil {
             }
             return "";
         } catch (SocketException e) {
-            throw new UnsupportedOperationException("Failed to retrieve local machine IP address", e);
+            throw new UnsupportedOperationException("Failed to retrieve local" +
+                    " machine IP address", e);
         }
     }
 }

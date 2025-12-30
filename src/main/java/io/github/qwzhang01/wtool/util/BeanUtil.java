@@ -212,7 +212,7 @@ public class BeanUtil {
      * @param obj2 the second object to compare
      * @return true if both objects are equal or both are null, false otherwise
      */
-    public static boolean equals(Object obj1, Object obj2) {
+    public static <T> boolean equals(T obj1, T obj2) {
         if (obj1 == null && obj2 == null) {
             return true;
         }
@@ -227,6 +227,46 @@ public class BeanUtil {
 
         return obj1.equals(obj2);
     }
+
+    public static <P2, R> boolean equals(R obj1,
+                                         P2 obj2,
+                                         Function<P2, R> mapper2) {
+        R obj22 = null;
+        if (obj2 != null) {
+            obj22 = mapper2.apply(obj2);
+        }
+
+        return equals(obj1, obj22);
+    }
+
+    public static <P1, R> boolean equals(P1 obj1,
+                                         Function<P1, R> mapper1,
+                                         R obj2) {
+        R obj12 = null;
+        if (obj1 != null) {
+            obj12 = mapper1.apply(obj1);
+        }
+
+        return equals(obj12, obj2);
+    }
+
+    public static <P1, P2, R> boolean equals(P1 obj1,
+                                             Function<P1, R> mapper1,
+                                             P2 obj2,
+                                             Function<P2, R> mapper2) {
+        R obj12 = null;
+        if (obj1 != null) {
+            obj12 = mapper1.apply(obj1);
+        }
+
+        R obj22 = null;
+        if (obj2 != null) {
+            obj22 = mapper2.apply(obj2);
+        }
+
+        return equals(obj12, obj22);
+    }
+
 
     /**
      * Compares two lists for equality by checking if they contain the same
@@ -263,8 +303,10 @@ public class BeanUtil {
     }
 
     /**
-     * Compares two lists for equality after applying a mapper function to the second list.
-     * The mapper converts elements of list2 to the same type as list1 before comparison.
+     * Compares two lists for equality after applying a mapper function to
+     * the second list.
+     * The mapper converts elements of list2 to the same type as list1 before
+     * comparison.
      *
      * @param list1   the first list to compare
      * @param list2   the second list to compare
@@ -284,8 +326,10 @@ public class BeanUtil {
     }
 
     /**
-     * Compares two lists for equality after applying a mapper function to the first list.
-     * The mapper converts elements of list1 to the same type as list2 before comparison.
+     * Compares two lists for equality after applying a mapper function to
+     * the first list.
+     * The mapper converts elements of list1 to the same type as list2 before
+     * comparison.
      *
      * @param list1   the first list to compare
      * @param mapper1 function to transform elements of list1 to type R
@@ -306,8 +350,10 @@ public class BeanUtil {
     }
 
     /**
-     * Compares two lists for equality after applying mapper functions to both lists.
-     * Both mappers convert their respective list elements to a common type for comparison.
+     * Compares two lists for equality after applying mapper functions to
+     * both lists.
+     * Both mappers convert their respective list elements to a common type
+     * for comparison.
      *
      * @param list1   the first list to compare
      * @param mapper1 function to transform elements of list1 to type R

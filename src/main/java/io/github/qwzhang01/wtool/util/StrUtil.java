@@ -53,12 +53,15 @@ public class StrUtil {
 
     /**
      * Decodes a Base64 encoded string to byte array.
-     * This method automatically handles data URIs by removing the "base64," prefix if present.
-     * For example, it can decode both "SGVsbG8=" and "data:image/png;base64,SGVsbG8=".
+     * This method automatically handles data URIs by removing the "base64,"
+     * prefix if present.
+     * For example, it can decode both "SGVsbG8=" and "data:image/png;base64,
+     * SGVsbG8=".
      *
      * @param base64 the Base64 encoded string to decode
      * @return the decoded byte array
-     * @throws Base64DecodeException if the string is not valid Base64 or decoding fails
+     * @throws Base64DecodeException if the string is not valid Base64 or
+     * decoding fails
      */
     public static byte[] decodeBase64(String base64) {
         try {
