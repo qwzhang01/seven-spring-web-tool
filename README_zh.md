@@ -1,6 +1,6 @@
 # Seven Spring Web Tool
 
-[![Maven Central](https://img.shields.io/badge/maven--central-v1.0.1-blue)](https://central.sonatype.com/)
+[![Maven Central](https://img.shields.io/badge/maven--central-v1.0.2-blue)](https://central.sonatype.com/)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-yellow.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Java](https://img.shields.io/badge/Java-17%2B-orange)](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.1.5-brightgreen)](https://spring.io/projects/spring-boot)
@@ -58,14 +58,14 @@
 <dependency>
     <groupId>io.github.qwzhang01</groupId>
     <artifactId>seven-spring-web-tool</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
 </dependency>
 ```
 
 ### Gradle 依赖
 
 ```gradle
-implementation 'io.github.qwzhang01:seven-spring-web-tool:1.0.1'
+implementation 'io.github.qwzhang01:seven-spring-web-tool:1.0.2'
 ```
 
 > **注意**：添加此依赖后，您将自动获得 **seven-shield**、**seven-operating-record** 和 **seven-data-security** 库的访问权限，无需单独添加。
@@ -222,6 +222,11 @@ int nullLength = StrUtil.length(null);  // 0
 
 // 生成 UUID（小写，无连字符）
 String uuid = StrUtil.uuidStr();  // "a1b2c3d4e5f6789..."
+
+// Base64 字符串解码（支持数据 URI）
+byte[] bytes = StrUtil.decodeBase64("SGVsbG8gV29ybGQ=");
+// 也可以处理数据 URI，如 "data:image/png;base64,iVBORw0KG..."
+byte[] imageBytes = StrUtil.decodeBase64("data:image/png;base64,iVBORw0KG...");
 ```
 
 ### 5. MultipartFile DTO
@@ -431,6 +436,14 @@ Map<String, Object> userMap = BeanUtil.objectToMap(user);
 - **[seven-data-security](https://github.com/qwzhang01/seven-data-security)** - 数据安全和加密工具
 
 ## 📝 更新日志
+
+### v1.0.2 (2025-12-30)
+
+- ✨ 增强所有类和方法的 Javadoc 注释
+- 📚 改进文档，增加更详细的示例
+- 🐛 修复 Base64DecodeException 类注释错误
+- ✨ 添加支持数据 URI 的 Base64 解码工具
+- 🔧 更好的代码文档，适合企业使用
 
 ### v1.0.1 (2025-12-30)
 

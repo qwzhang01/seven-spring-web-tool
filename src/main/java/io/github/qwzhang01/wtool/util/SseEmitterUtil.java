@@ -70,25 +70,25 @@ public class SseEmitterUtil {
         SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
         EMITTERS.put(uuid, emitter);
 
-        // 完成时移除
+        // Remove emitter when connection completes normally
         emitter.onCompletion(() -> {
             log.info("SSE connection completed for client: {}", uuid);
             removeEmitter(uuid);
         });
 
-        // 超时时移除
+        // Remove emitter when connection times out
         emitter.onTimeout(() -> {
             log.info("SSE connection timeout for client: {}", uuid);
             removeEmitter(uuid);
         });
 
-        // 错误时移除
+        // Remove emitter when an error occurs
         emitter.onError(throwable -> {
             log.error("SSE uuid error for client: {}", uuid, throwable);
             removeEmitter(uuid);
         });
 
-        // 发送连接成功消息
+        // Send initial connection success message
         sendToClient(clientId, message);
         return emitter;
     }

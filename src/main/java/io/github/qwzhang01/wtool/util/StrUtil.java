@@ -1,5 +1,8 @@
 package io.github.qwzhang01.wtool.util;
 
+import io.github.qwzhang01.wtool.exception.Base64DecodeException;
+
+import java.util.Base64;
 import java.util.UUID;
 
 /**
@@ -46,5 +49,25 @@ public class StrUtil {
      */
     public static String uuidStr() {
         return UUID.randomUUID().toString().replace("-", "").toLowerCase();
+    }
+
+    /**
+     * Decodes a Base64 encoded string to byte array.
+     * This method automatically handles data URIs by removing the "base64," prefix if present.
+     * For example, it can decode both "SGVsbG8=" and "data:image/png;base64,SGVsbG8=".
+     *
+     * @param base64 the Base64 encoded string to decode
+     * @return the decoded byte array
+     * @throws Base64DecodeException if the string is not valid Base64 or decoding fails
+     */
+    public static byte[] decodeBase64(String base64) {
+        try {
+            if (base64.contains("base64,")) {
+                base64 = base64.substring(base64.indexOf("base64,") + 7);
+            }
+            return Base64.getDecoder().decode(base64);
+        } catch (Exception e) {
+            throw new Base64DecodeException("Base64 decode error", e);
+        }
     }
 }

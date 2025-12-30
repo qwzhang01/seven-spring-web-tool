@@ -9,6 +9,7 @@ import org.springframework.beans.BeanUtils;
 import java.lang.reflect.Constructor;
 import java.util.*;
 import java.util.function.BiPredicate;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -237,7 +238,7 @@ public class BeanUtil {
      * @return true if both lists contain the same elements (regardless of
      * order), false otherwise
      */
-    public static boolean listEquals(List<?> list1, List<?> list2) {
+    public static <T> boolean listEquals(List<T> list1, List<T> list2) {
         if ((list1 == null || list1.isEmpty()) && (list2 == null || list2.isEmpty())) {
             return true;
         }
@@ -259,6 +260,77 @@ public class BeanUtil {
         int size = set.size();
         set.addAll(list2.stream().map(String::valueOf).toList());
         return set.size() == size;
+    }
+
+    /**
+     * Compares two lists for equality after applying a mapper function to the second list.
+     * The mapper converts elements of list2 to the same type as list1 before comparison.
+     *
+     * @param list1   the first list to compare
+     * @param list2   the second list to compare
+     * @param mapper2 function to transform elements of list2 to type R
+     * @param <P2>    the type of elements in the second list
+     * @param <R>     the common type for comparison
+     * @return true if both lists contain the same elements after transformation
+     */
+    public static <P2, R> boolean listEquals(List<R> list1,
+                                             List<P2> list2,
+                                             Function<P2, R> mapper2) {
+        List<R> list22 = null;
+        if (list2 != null && !list2.isEmpty()) {
+            list22 = list2.stream().map(mapper2).toList();
+        }
+        return listEquals(list1, list22);
+    }
+
+    /**
+     * Compares two lists for equality after applying a mapper function to the first list.
+     * The mapper converts elements of list1 to the same type as list2 before comparison.
+     *
+     * @param list1   the first list to compare
+     * @param mapper1 function to transform elements of list1 to type R
+     * @param list2   the second list to compare
+     * @param <P1>    the type of elements in the first list
+     * @param <R>     the common type for comparison
+     * @return true if both lists contain the same elements after transformation
+     */
+    public static <P1, R> boolean listEquals(List<P1> list1,
+                                             Function<P1, R> mapper1,
+                                             List<R> list2) {
+
+        List<R> list12 = null;
+        if (list1 != null && !list1.isEmpty()) {
+            list12 = list1.stream().map(mapper1).toList();
+        }
+        return listEquals(list12, list2);
+    }
+
+    /**
+     * Compares two lists for equality after applying mapper functions to both lists.
+     * Both mappers convert their respective list elements to a common type for comparison.
+     *
+     * @param list1   the first list to compare
+     * @param mapper1 function to transform elements of list1 to type R
+     * @param list2   the second list to compare
+     * @param mapper2 function to transform elements of list2 to type R
+     * @param <P1>    the type of elements in the first list
+     * @param <P2>    the type of elements in the second list
+     * @param <R>     the common type for comparison
+     * @return true if both lists contain the same elements after transformation
+     */
+    public static <P1, P2, R> boolean listEquals(List<P1> list1,
+                                                 Function<P1, R> mapper1,
+                                                 List<P2> list2,
+                                                 Function<P2, R> mapper2) {
+        List<R> list12 = null;
+        if (list1 != null && !list1.isEmpty()) {
+            list12 = list1.stream().map(mapper1).toList();
+        }
+        List<R> list22 = null;
+        if (list2 != null && !list2.isEmpty()) {
+            list22 = list2.stream().map(mapper2).toList();
+        }
+        return listEquals(list12, list22);
     }
 
     /**

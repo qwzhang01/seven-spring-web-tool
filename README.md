@@ -1,6 +1,6 @@
 # Seven Spring Web Tool
 
-[![Maven Central](https://img.shields.io/badge/maven--central-v1.0.1-blue)](https://central.sonatype.com/)
+[![Maven Central](https://img.shields.io/badge/maven--central-v1.0.2-blue)](https://central.sonatype.com/)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-yellow.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Java](https://img.shields.io/badge/Java-17%2B-orange)](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.1.5-brightgreen)](https://spring.io/projects/spring-boot)
@@ -56,14 +56,14 @@ By adding this single dependency to your project, you automatically gain access 
 <dependency>
     <groupId>io.github.qwzhang01</groupId>
     <artifactId>seven-spring-web-tool</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
 </dependency>
 ```
 
 ### Gradle Dependency
 
 ```gradle
-implementation 'io.github.qwzhang01:seven-spring-web-tool:1.0.1'
+implementation 'io.github.qwzhang01:seven-spring-web-tool:1.0.2'
 ```
 
 > **Note**: By adding this dependency, you automatically get access to **seven-shield**, **seven-operating-record**, and **seven-data-security** libraries without needing to add them separately.
@@ -220,6 +220,11 @@ int nullLength = StrUtil.length(null);  // 0
 
 // Generate UUID (lowercase, without hyphens)
 String uuid = StrUtil.uuidStr();  // "a1b2c3d4e5f6789..."
+
+// Decode Base64 string (supports data URIs)
+byte[] bytes = StrUtil.decodeBase64("SGVsbG8gV29ybGQ=");
+// Also handles data URIs like "data:image/png;base64,iVBORw0KG..."
+byte[] imageBytes = StrUtil.decodeBase64("data:image/png;base64,iVBORw0KG...");
 ```
 
 ### 5. MultipartFile DTO
@@ -429,6 +434,14 @@ This library integrates and depends on the following projects:
 - **[seven-data-security](https://github.com/qwzhang01/seven-data-security)** - Data security and encryption utilities
 
 ## 📝 Changelog
+
+### v1.0.2 (2025-12-30)
+
+- ✨ Enhanced Javadoc comments for all classes and methods
+- 📚 Improved documentation with more detailed examples
+- 🐛 Fixed Base64DecodeException class comment error
+- ✨ Added Base64 decoding utility with data URI support
+- 🔧 Better code documentation for enterprise use
 
 ### v1.0.1 (2025-12-30)
 
