@@ -1,5 +1,6 @@
 package io.github.qwzhang01.wtool.util;
 
+import io.github.qwzhang01.wtool.sse.SseConnectionManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,9 +21,8 @@ class SseEmitterUtilTest {
 
     @BeforeEach
     void setUp() {
-        // Clear all connections before each test
-        Map<String, String> clients = SseEmitterUtil.getClientIds();
-        clients.keySet().forEach(SseEmitterUtil::close);
+        // Reset connection manager before each test
+        SseEmitterUtil.setConnectionManager(new SseConnectionManager());
     }
 
     @AfterEach

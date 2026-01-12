@@ -1,43 +1,71 @@
 package io.github.qwzhang01.wtool.util;
 
-import io.github.qwzhang01.wtool.domain.SseMsg;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.github.qwzhang01.wtool.sse.SseConnectionManager;
+import io.github.qwzhang01.wtool.sse.SseMessageBroker;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.io.IOException;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import static io.github.qwzhang01.wtool.util.StrUtil.uuidStr;
-
 
 /**
  * Utility class for managing Server-Sent Events (SSE) connections.
  * Provides methods for creating, managing, and sending messages through SSE
  * emitters.
  * Supports client connection lifecycle management and message broadcasting.
+ * <p>
+ * This class now supports multi-instance deployment through
+ * {@link SseConnectionManager}. For single-instance deployments, it works
+ * out of the box. For multi-instance deployments, configure a message broker
+ * using {@link #setConnectionManager(SseConnectionManager)}.
+ * <p>
+ * Example for multi-instance setup with Redis:
+ * <pre>
+ * RedisSseMessageBroker broker = new RedisSseMessageBroker(
+ *     redisTemplate, listenerContainer, "instance-1");
+ * SseConnectionManager manager = new SseConnectionManager(broker, "instance-1");
+ * SseEmitterUtil.setConnectionManager(manager);
+ * </pre>
  *
  * @author avinzhang
+ * @see SseConnectionManager
+ * @see SseMessageBroker
  */
 public class SseEmitterUtil {
-    private static final Logger log =
-            LoggerFactory.getLogger(SseEmitterUtil.class);
 
     /**
-     * Default timeout for SSE connections: 30 minutes
+     * The connection manager that handles SSE connections.
+     * Defaults to a local single-instance manager.
      */
-    private static final Long DEFAULT_TIMEOUT = 30 * 60 * 1000L;
+    private static volatile SseConnectionManager connectionManager =
+            new SseConnectionManager();
+
     /**
-     * Maps client IDs to their corresponding connection IDs
+     * Private constructor to prevent instantiation.
      */
-    private static final ConcurrentHashMap<String, String> CLIENT =
-            new ConcurrentHashMap<>();
+    private SseEmitterUtil() {
+    }
+
     /**
-     * Stores all active SSE emitter connections
+     * Sets the connection manager for multi-instance support.
+     * <p>
+     * Call this method during application startup to configure
+     * multi-instance SSE support with a custom broker (e.g., Redis).
+     *
+     * @param manager the connection manager to use
      */
-    private static final ConcurrentHashMap<String, SseEmitter> EMITTERS =
-            new ConcurrentHashMap<>();
+    public static void setConnectionManager(SseConnectionManager manager) {
+        if (manager != null) {
+            connectionManager = manager;
+        }
+    }
+
+    /**
+     * Gets the current connection manager.
+     *
+     * @return the connection manager
+     */
+    public static SseConnectionManager getConnectionManager() {
+        return connectionManager;
+    }
 
     /**
      * Gets the mapping of client IDs to connection IDs.
@@ -45,7 +73,7 @@ public class SseEmitterUtil {
      * @return a map of client IDs to their connection IDs
      */
     public static Map<String, String> getClientIds() {
-        return CLIENT;
+        return connectionManager.getClientIds();
     }
 
     /**
@@ -55,102 +83,34 @@ public class SseEmitterUtil {
      * @param clientId the unique identifier for the client
      * @param message  the initial message to send upon connection
      * @return a new SseEmitter instance configured with timeout and event
-     * handlers
+     *         handlers
      */
     public static SseEmitter createEmitter(String clientId, String message) {
-        String oldClientId = CLIENT.remove(clientId);
-
-        if (!StrUtil.isBlank(oldClientId)) {
-            // 移除旧的连接
-            removeEmitter(oldClientId);
-        }
-        String uuid = uuidStr();
-        CLIENT.put(clientId, uuid);
-
-        SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
-        EMITTERS.put(uuid, emitter);
-
-        // Remove emitter when connection completes normally
-        emitter.onCompletion(() -> {
-            log.info("SSE connection completed for client: {}", uuid);
-            removeEmitter(uuid);
-        });
-
-        // Remove emitter when connection times out
-        emitter.onTimeout(() -> {
-            log.info("SSE connection timeout for client: {}", uuid);
-            removeEmitter(uuid);
-        });
-
-        // Remove emitter when an error occurs
-        emitter.onError(throwable -> {
-            log.error("SSE uuid error for client: {}", uuid, throwable);
-            removeEmitter(uuid);
-        });
-
-        // Send initial connection success message
-        sendToClient(clientId, message);
-        return emitter;
-    }
-
-    /**
-     * Removes an emitter from the active connections and completes it.
-     *
-     * @param clientId the connection ID of the emitter to remove
-     */
-    private static void removeEmitter(String clientId) {
-        SseEmitter emitter = EMITTERS.remove(clientId);
-        if (emitter != null) {
-            emitter.complete();
-        }
+        return connectionManager.createEmitter(clientId, message);
     }
 
     /**
      * Sends a message to a specific client.
+     * In multi-instance mode, the message will be routed to the correct
+     * instance if the client is connected elsewhere.
      *
      * @param clientId the client ID to send the message to
      * @param message  the message content
      * @return true if the message was sent successfully, false otherwise
      */
     public static boolean sendToClient(String clientId, String message) {
-        clientId = CLIENT.get(clientId);
-        if (StrUtil.isBlank(clientId)) {
-            return false;
-        }
-
-        SseEmitter emitter = EMITTERS.get(clientId);
-        if (emitter != null) {
-            try {
-                SseMsg messageBean = new SseMsg(message, "system",
-                        SseMsg.MessageType.TEXT);
-
-                emitter.send(SseEmitter.event()
-                        .id(messageBean.getId())
-                        .name("message")
-                        .data(messageBean));
-
-                return true;
-            } catch (IOException e) {
-                log.error("Failed to send message to client: {}", clientId, e);
-                removeEmitter(clientId);
-                return false;
-            }
-        }
-        return false;
+        return connectionManager.sendToClient(clientId, message);
     }
 
     /**
      * Broadcasts a message to all connected clients.
+     * In multi-instance mode, the message will be sent to clients
+     * across all instances.
      *
      * @param message the message to broadcast
      */
     public static void broadcast(String message) {
-        CLIENT.keySet().forEach(clientId -> {
-            boolean send = sendToClient(clientId, message);
-            if (!send) {
-                close(clientId);
-            }
-        });
+        connectionManager.broadcast(message);
     }
 
     /**
@@ -159,9 +119,34 @@ public class SseEmitterUtil {
      * @param clientId the client ID whose connection should be closed
      */
     public static void close(String clientId) {
-        clientId = CLIENT.remove(clientId);
-        if (!StrUtil.isBlank(clientId)) {
-            removeEmitter(clientId);
-        }
+        connectionManager.close(clientId);
+    }
+
+    /**
+     * Checks if a client is connected (locally or on another instance).
+     *
+     * @param clientId the client ID
+     * @return true if the client is connected
+     */
+    public static boolean isClientConnected(String clientId) {
+        return connectionManager.isClientConnected(clientId);
+    }
+
+    /**
+     * Gets the number of local connections on this instance.
+     *
+     * @return the number of active local connections
+     */
+    public static int getLocalConnectionCount() {
+        return connectionManager.getLocalConnectionCount();
+    }
+
+    /**
+     * Gets the instance ID for the current connection manager.
+     *
+     * @return the instance ID
+     */
+    public static String getInstanceId() {
+        return connectionManager.getInstanceId();
     }
 }

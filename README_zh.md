@@ -1,6 +1,6 @@
 # Seven Spring Web Tool
 
-[![Maven Central](https://img.shields.io/badge/maven--central-v1.0.2-blue)](https://central.sonatype.com/)
+[![Maven Central](https://img.shields.io/badge/maven--central-v1.0.5-blue)](https://central.sonatype.com/)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-yellow.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Java](https://img.shields.io/badge/Java-17%2B-orange)](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.1.5-brightgreen)](https://spring.io/projects/spring-boot)
@@ -58,14 +58,14 @@
 <dependency>
     <groupId>io.github.qwzhang01</groupId>
     <artifactId>seven-spring-web-tool</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.5</version>
 </dependency>
 ```
 
 ### Gradle 依赖
 
 ```gradle
-implementation 'io.github.qwzhang01:seven-spring-web-tool:1.0.2'
+implementation 'io.github.qwzhang01:seven-spring-web-tool:1.0.5'
 ```
 
 > **注意**：添加此依赖后，您将自动获得 **seven-shield**、**seven-operating-record** 和 **seven-data-security** 库的访问权限，无需单独添加。
@@ -123,7 +123,7 @@ Map<String, Object> map = BeanUtil.objectToMap(user);
 
 ### 2. SSE 工具类 (SseEmitterUtil)
 
-生产级服务器推送事件实现，具有自动连接生命周期管理。
+生产级服务器推送事件实现，具有自动连接生命周期管理，**支持多实例部署**。
 
 #### 创建 SSE 连接
 
@@ -150,6 +150,50 @@ SseEmitterUtil.broadcast("系统通知：服务器将在 10 分钟后维护");
 
 ```java
 SseEmitterUtil.close("client123");
+```
+
+#### 多实例部署（Redis）
+
+对于部署在多个实例上的应用程序，可以使用 Redis 同步 SSE 连接：
+
+**步骤 1：添加 Redis 依赖**
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-redis</artifactId>
+</dependency>
+```
+
+**步骤 2：配置 Redis 连接**
+
+```yaml
+spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+# 可选的 SSE 配置
+sse:
+  redis:
+    enabled: true        # 默认：true（当 Redis 可用时自动启用）
+  instance:
+    id: my-instance-1    # 可选：如果不指定则自动生成
+```
+
+**工作原理：**
+- 客户端连接信息存储在 Redis 中，key 格式：`sse:client:{clientId}`
+- 每个实例订阅自己的频道：`sse:channel:{instanceId}`
+- 广播消息发布到 `sse:broadcast` 频道
+- 消息自动路由到正确的实例
+
+**禁用 Redis SSE（强制使用本地模式）：**
+
+```yaml
+sse:
+  redis:
+    enabled: false
 ```
 
 #### 前端示例
@@ -436,6 +480,15 @@ Map<String, Object> userMap = BeanUtil.objectToMap(user);
 - **[seven-data-security](https://github.com/qwzhang01/seven-data-security)** - 数据安全和加密工具
 
 ## 📝 更新日志
+
+### v1.0.5 (2026-01-12)
+
+- ✨ **SSE 多实例支持**：重构 `SseEmitterUtil` 以支持多实例部署
+- ✨ 新增 `SseConnectionManager` 用于管理 SSE 连接，支持消息代理抽象
+- ✨ 新增 `SseMessageBroker` 接口，包含 `LocalSseMessageBroker` 和 `RedisSseMessageBroker` 实现
+- ✨ 新增 `SseAutoConfiguration` 用于 Spring Boot 自动集成
+- ✨ Redis Pub/Sub 支持跨实例消息路由
+- 🔧 向后兼容的 API - 现有代码无需修改即可使用
 
 ### v1.0.2 (2025-12-30)
 

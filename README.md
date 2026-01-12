@@ -1,6 +1,6 @@
 # Seven Spring Web Tool
 
-[![Maven Central](https://img.shields.io/badge/maven--central-v1.0.2-blue)](https://central.sonatype.com/)
+[![Maven Central](https://img.shields.io/badge/maven--central-v1.0.5-blue)](https://central.sonatype.com/)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-yellow.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Java](https://img.shields.io/badge/Java-17%2B-orange)](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.1.5-brightgreen)](https://spring.io/projects/spring-boot)
@@ -56,14 +56,14 @@ By adding this single dependency to your project, you automatically gain access 
 <dependency>
     <groupId>io.github.qwzhang01</groupId>
     <artifactId>seven-spring-web-tool</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.5</version>
 </dependency>
 ```
 
 ### Gradle Dependency
 
 ```gradle
-implementation 'io.github.qwzhang01:seven-spring-web-tool:1.0.2'
+implementation 'io.github.qwzhang01:seven-spring-web-tool:1.0.5'
 ```
 
 > **Note**: By adding this dependency, you automatically get access to **seven-shield**, **seven-operating-record**, and **seven-data-security** libraries without needing to add them separately.
@@ -121,7 +121,7 @@ Map<String, Object> map = BeanUtil.objectToMap(user);
 
 ### 2. SSE Utility (SseEmitterUtil)
 
-Production-ready Server-Sent Events implementation with automatic connection lifecycle management.
+Production-ready Server-Sent Events implementation with automatic connection lifecycle management and **multi-instance deployment support**.
 
 #### Create SSE Connection
 
@@ -148,6 +148,50 @@ SseEmitterUtil.broadcast("System notification: Server maintenance in 10 minutes"
 
 ```java
 SseEmitterUtil.close("client123");
+```
+
+#### Multi-Instance Deployment (Redis)
+
+For applications deployed across multiple instances, SSE connections can be synchronized using Redis:
+
+**Step 1: Add Redis dependency**
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-redis</artifactId>
+</dependency>
+```
+
+**Step 2: Configure Redis connection**
+
+```yaml
+spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+# Optional SSE configuration
+sse:
+  redis:
+    enabled: true        # Default: true (auto-enabled when Redis is available)
+  instance:
+    id: my-instance-1    # Optional: auto-generated if not specified
+```
+
+**How it works:**
+- Client connection info is stored in Redis with key pattern: `sse:client:{clientId}`
+- Each instance subscribes to its own channel: `sse:channel:{instanceId}`
+- Broadcast messages are published to `sse:broadcast` channel
+- Messages are automatically routed to the correct instance
+
+**Disable Redis SSE (force local mode):**
+
+```yaml
+sse:
+  redis:
+    enabled: false
 ```
 
 #### Frontend Example
@@ -434,6 +478,15 @@ This library integrates and depends on the following projects:
 - **[seven-data-security](https://github.com/qwzhang01/seven-data-security)** - Data security and encryption utilities
 
 ## 📝 Changelog
+
+### v1.0.5 (2026-01-12)
+
+- ✨ **SSE Multi-Instance Support**: Refactored `SseEmitterUtil` to support multi-instance deployments
+- ✨ Added `SseConnectionManager` for managing SSE connections with broker abstraction
+- ✨ Added `SseMessageBroker` interface with `LocalSseMessageBroker` and `RedisSseMessageBroker` implementations
+- ✨ Added `SseAutoConfiguration` for automatic Spring Boot integration
+- ✨ Redis Pub/Sub support for cross-instance message routing
+- 🔧 Backward compatible API - existing code works without changes
 
 ### v1.0.2 (2025-12-30)
 
