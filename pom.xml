@@ -6,7 +6,8 @@
 
     <groupId>io.github.qwzhang01</groupId>
     <artifactId>seven-spring-web-tool</artifactId>
-    <version>1.0.10</version>
+    <version>1.0.11</version>
+    <packaging>jar</packaging>
 
     <url>https://github.com/qwzhang01/seven-spring-web-tool</url>
 
@@ -15,8 +16,9 @@
 
     <licenses>
         <license>
-            <name>The Apache Software License, Version 2.0</name>
+            <name>Apache License, Version 2.0</name>
             <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
         </license>
     </licenses>
 
@@ -29,36 +31,53 @@
                 <role>Project Manager</role>
                 <role>Architect</role>
             </roles>
+            <timezone>+8</timezone>
         </developer>
     </developers>
 
     <scm>
-        <connection>https://github.com/qwzhang01/seven-spring-web-tool.git
-        </connection>
-        <developerConnection>git@github.com:qwzhang01/seven-spring-web-tool.git
-        </developerConnection>
+        <connection>scm:git:https://github.com/qwzhang01/seven-spring-web-tool.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com:qwzhang01/seven-spring-web-tool.git</developerConnection>
         <url>https://github.com/qwzhang01/seven-spring-web-tool</url>
+        <tag>HEAD</tag>
     </scm>
+
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>https://github.com/qwzhang01/seven-spring-web-tool/issues</url>
+    </issueManagement>
+
+    <ciManagement>
+        <system>GitHub Actions</system>
+        <url>https://github.com/qwzhang01/seven-spring-web-tool/actions</url>
+    </ciManagement>
 
     <distributionManagement>
         <repository>
             <id>github</id>
             <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/qwzhang01/seven-spring-web-tool
-            </url>
+            <url>https://maven.pkg.github.com/qwzhang01/seven-spring-web-tool</url>
         </repository>
+        <snapshotRepository>
+            <id>github</id>
+            <name>GitHub Snapshots</name>
+            <url>https://maven.pkg.github.com/qwzhang01/seven-spring-web-tool</url>
+        </snapshotRepository>
     </distributionManagement>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.release>17</maven.compiler.release>
+        
         <spring-boot.version>3.1.5</spring-boot.version>
         <mysql-connector-java.version>8.0.29</mysql-connector-java.version>
         <mybatis-plus.version>3.5.11</mybatis-plus.version>
         <seven-shield.version>1.0.2</seven-shield.version>
         <seven-operating-record.version>1.0.3</seven-operating-record.version>
-        <seven-data-security.version>1.2.23</seven-data-security.version>
+        <seven-data-security.version>1.2.25</seven-data-security.version>
         <junit.jupiter.version>5.10.3</junit.jupiter.version>
         <mockito.version>5.18.0</mockito.version>
     </properties>
@@ -182,6 +201,9 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot.version}</version>
+                <configuration>
+                    <classifier>exec</classifier>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -194,6 +216,42 @@
                 <version>3.4.0</version>
                 <configuration>
                     <skipTests>false</skipTests>
+                    <includes>
+                        <include>**/*Test.java</include>
+                    </includes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>3.4.0</version>
+                <configuration>
+                    <includes>
+                        <include>**/IT*.java</include>
+                        <include>**/*IT.java</include>
+                        <include>**/*IntegrationTest.java</include>
+                    </includes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                        </manifest>
+                    </archive>
                 </configuration>
             </plugin>
             <!-- central发布插件 -->
@@ -203,8 +261,7 @@
                 <version>0.8.0</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <publishingServerId>avinzhang-opensource
-                    </publishingServerId>
+                    <publishingServerId>avinzhang-opensource</publishingServerId>
                     <tokenAuth>true</tokenAuth>
                 </configuration>
             </plugin>
@@ -216,6 +273,7 @@
                 <executions>
                     <execution>
                         <id>attach-sources</id>
+                        <phase>package</phase>
                         <goals>
                             <goal>jar-no-fork</goal>
                         </goals>
@@ -230,11 +288,16 @@
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
+                        <phase>package</phase>
                         <goals>
                             <goal>jar</goal>
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <doclint>none</doclint>
+                    <show>public</show>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -260,4 +323,50 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
