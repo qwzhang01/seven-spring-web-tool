@@ -6,7 +6,7 @@
 
     <groupId>io.github.qwzhang01</groupId>
     <artifactId>seven-spring-web-tool</artifactId>
-    <version>1.0.12</version>
+    <version>1.0.13</version>
     <packaging>jar</packaging>
 
     <url>https://github.com/qwzhang01/seven-spring-web-tool</url>
@@ -76,8 +76,8 @@
         <mysql-connector-java.version>8.0.29</mysql-connector-java.version>
         <mybatis-plus.version>3.5.11</mybatis-plus.version>
         <seven-shield.version>1.0.2</seven-shield.version>
-        <seven-operating-record.version>1.0.3</seven-operating-record.version>
-        <seven-data-security.version>1.2.26</seven-data-security.version>
+        <seven-operating-record.version>1.0.4</seven-operating-record.version>
+        <seven-data-security.version>1.2.27</seven-data-security.version>
         <junit.jupiter.version>5.10.3</junit.jupiter.version>
         <mockito.version>5.18.0</mockito.version>
     </properties>
